@@ -15,13 +15,17 @@ dataset_title = eq_data_all['metadata']['title']
 # appending specified data to appropriate lists using list comprehensions.
 lons, lats, mags, hover_texts = (
     [
-    eq_data_dict['geometry']['coordinates'][0] for eq_data_dict in eq_data_dicts
+    eq_data_dict['geometry']['coordinates'][0]
+        for eq_data_dict in eq_data_dicts
 ], [
-    eq_data_dict['geometry']['coordinates'][1] for eq_data_dict in eq_data_dicts
+    eq_data_dict['geometry']['coordinates'][1]
+        for eq_data_dict in eq_data_dicts
 ], [
-    eq_data_dict['properties']['mag'] for eq_data_dict in eq_data_dicts
+    eq_data_dict['properties']['mag']
+        for eq_data_dict in eq_data_dicts
 ], [
-    eq_data_dict['properties']['title'] for eq_data_dict in eq_data_dicts
+    eq_data_dict['properties']['title']
+        for eq_data_dict in eq_data_dicts
 ])
 
 # building the characteristic data for the map/graph in a dictionary.
