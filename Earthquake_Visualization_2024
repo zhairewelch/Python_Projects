@@ -1,0 +1,60 @@
+import geojson
+from plotly.graph_objs import Scattergeo, Layout
+from plotly import offline
+filename = 'data/1.0_past_month.geojson'
+
+# .geojson file needed encoding to be set=utf-8
+with open(filename, encoding='utf8') as f:
+    eq_data_all = geojson.load(f)
+
+# Indexing the nested dict we will be working with.
+eq_data_dicts = eq_data_all['features']
+# setting the index of the data with the title equal to dataset_title
+dataset_title = eq_data_all['metadata']['title']
+
+# appending specified data to appropriate lists using list comprehensions.
+lons, lats, mags, hover_texts = (
+    [
+    eq_data_dict['geometry']['coordinates'][0] for eq_data_dict in eq_data_dicts
+], [
+    eq_data_dict['geometry']['coordinates'][1] for eq_data_dict in eq_data_dicts
+], [
+    eq_data_dict['properties']['mag'] for eq_data_dict in eq_data_dicts
+], [
+    eq_data_dict['properties']['title'] for eq_data_dict in eq_data_dicts
+])
+
+# building the characteristic data for the map/graph in a dictionary.
+data = [{'type': 'scattergeo',
+         'lon': lons,
+         'lat': lats,
+         'text': hover_texts,
+         'marker': {
+             'size': [5*mag for mag in mags],
+             'color': mags,
+             'colorscale': 'Hot',
+             'reversescale': True,
+             'colorbar': {'title': 'Magnitude'},
+         },
+    }]
+
+# formatting the layout of the map, customizations etc.
+my_layout = Layout(title=dataset_title,
+                   paper_bgcolor='slategrey',
+                   width=1700,
+                   height=850,
+                   geo=dict(
+                       showland=True,
+                       showcountries=True,
+                       oceancolor='slategrey',
+                       bgcolor='slategrey',
+                       showframe=False,
+                       landcolor='rgb(217, 217, 217)',
+                   )
+)
+
+# now assigning plot characteristic data to the fig variable
+fig = {'data': data, 'layout': my_layout}
+
+# plotting the graph with the variable 'fig' and giving the file an appropiate name.
+offline.plot(fig, filename='global_earthquakes_pastmonth.html')
