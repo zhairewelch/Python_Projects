@@ -1,0 +1,75 @@
+import requests
+import plotly.express as px
+
+# Storing the possible list of languages in a var.
+language = ['python',
+            'javascript',
+            'c',
+            'java',
+            'perl',
+            'haskell',
+            'go',
+            ]
+
+# Specifying the api path
+url = 'https://api.github.com/search/repositories'
+
+# Specifying the language within the language var.
+url += (f"?q=language:{language[0].title()}"
+        f"+sort:stars+stars:>10000")
+
+headers = {"Accept": "application/vnd.github.v3+json"}
+# Storing the API under the variable 'r'
+r = requests.get(url, headers=headers)
+
+# Reading the API as a .json and assigning to a var.
+response_dict=r.json()
+
+# Specifying the dictionary with the data we want.
+repo_dicts = response_dict['items']
+
+# Creating empty lists to store relative data within.
+repo_links, stars, hover_texts = [], [], []
+
+# Creating loop that locates relative data and appends
+# to the empty list specified.
+for repo_dict in repo_dicts:
+    repo_name = repo_dict['name']
+    repo_url = repo_dict['html_url']
+    repo_link = f"<a href='{repo_url}'>{repo_name}</a>"
+    repo_links.append(repo_link)
+    stars.append(repo_dict['stargazers_count'])
+
+    owner = repo_dict['owner']['login']
+    description = repo_dict['description']
+    # Adding a hyperlink as hover text for the visualization.
+    hover_text = f"{owner} <br />{description}"
+    hover_texts.append(hover_text)
+
+# Setting the title using the language index.
+title = (f"Most-Starred {language[0].title()}"
+         f" Projects on Github")
+
+# Setting the x and y label titles.
+labels = {'x': 'Repository', 'y': 'Stars'}
+
+# Assigning the data from the empty strings to the plot,
+# As well as the title and label data.
+fig = px.bar(x=repo_links, y=stars,
+             title=title,
+             labels=labels,
+             hover_name=hover_texts,
+             )
+
+# Formatting the plot, specifying fontsizes.
+fig.update_layout(title_font_size=22,
+                  xaxis_title_font_size=18,
+                  yaxis_title_font_size=18,)
+
+# Customizing bar colors and opacity.
+fig.update_traces(marker_color='maroon',
+                  marker_opacity=0.6)
+fig.show()
+
+# Below code is greyed out intentionally.
+# fig.write_html('python1-most-starred.html')
